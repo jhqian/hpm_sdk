@@ -67,15 +67,8 @@
       linker_additional_files="{{ target["ses_link_input"] }}"
       {%- endif %}
       />
-    {%- for group in target["groups"] %}
-    <folder Name="{{ group.name }}">
-      {%- for file in group.files %}
-      <file file_name="{{ file.path }}">
-        <configuration Name="Common" build_object_file_name="{{ file.obj_path }}$(OBJ)" />
-      </file>
-      {%- endfor %}
-    </folder>
-    {%- endfor %}
+
+{{ target["file_structure"] }}
     <configuration
       Name="Debug"
       debug_cpu_registers_file="{{ target["cpu_register_definition"] }}"
