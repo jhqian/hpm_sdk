@@ -51,11 +51,11 @@ def file_to_be_excluded(f):
     return False
 
 def get_relpath(f, base):
-    return os.path.relpath(f, base)
+    return re.sub(r'\\', r'/', os.path.relpath(f, base))
 
 def get_sdk_fullpath(f, sdk_base):
     # replace real path with sdk base variable to be defined in SES
-    return os.path.join(HPM_SDK_BASE, get_relpath(f, sdk_base))
+    return "/".join([HPM_SDK_BASE, get_relpath(f, sdk_base)])
 
 def is_sdk_file(f, sdk_base):
     r = re.sub(re.escape(sdk_base), r'', f)
@@ -72,7 +72,6 @@ def get_include_path(config, sdk_base, out_dir):
             inc_path = get_sdk_fullpath(i, sdk_base)
         else:
             inc_path = get_relpath(i, out_dir)
-        inc_path = re.sub(r'\\', r'/', inc_path)
         l.append(inc_path)
     return l
 
@@ -120,7 +119,8 @@ def populate_file_nodes(root, sdk_base, project_dir, out_dir, level = 1):
                 else:
                     node += "%s<file file_name=\"%s\">\n" % (" " * (level * 2), get_relpath(f, out_dir))
                     obj = re.sub(re.escape(project_dir), r'app', f)
-                node += "%s<configuration Name=\"Common\" build_object_file_name=\"%s$(OBJ)\"/>\n" % (" " * ((level + 1) * 2), os.path.join("$(IntDir)", obj))
+                obj = re.sub(r'\\', r'/', obj)
+                node += "%s<configuration Name=\"Common\" build_object_file_name=\"%s$(OBJ)\"/>\n" % (" " * ((level + 1) * 2), "/".join(["$(IntDir)", obj]))
                 node += "%s</file>\n" % (" " * (level * 2))
         else:
             node += "%s<folder Name=\"%s\">\n" % (" " * (level * 2), n)
